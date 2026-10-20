@@ -3,24 +3,34 @@
 Flask service untuk mengelola review produk. Data review disimpan di MongoDB,
 dan produk diverifikasi lewat `product-service` sebelum review baru disimpan.
 
-## Menjalankan untuk development
+## Menjalankan dengan Docker Compose mandiri
 
-Dari folder `microservices`, jalankan database MongoDB dan product service:
+Jalankan dari folder `microservices/review-service`:
 
-```powershell
-docker compose up -d product-service product-db review-db
+```bash
+docker compose up --build
 ```
 
-Pastikan product service tersedia di `http://localhost:3000`, lalu dari folder
-`microservices/review-service` siapkan environment Python:
+Compose ini juga menjalankan `product-service` dan databasenya, karena review
+perlu memeriksa bahwa produk tersedia. Product service dibangun dari folder
+`../product-service`. MongoDB dan MySQL menyimpan data pada named volume.
+
+## Menjalankan Flask langsung untuk development
+
+Siapkan dependency dan file environment dari folder `microservices/review-service`:
 
 ```powershell
 py -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-Copy-Item .env.example .env
 python run.py
 ```
+
+Pastikan MongoDB dan product service aktif terlebih dahulu. Anda bisa
+menjalankannya lewat Compose mandiri dengan `docker compose up -d review-db
+product-service product-db`, atau lewat Compose gabungan dari folder
+`microservices` dengan `docker compose up -d review-db product-service product-db`.
+File `.env` lokal mengatur koneksi Flask ke port host `27017` dan `3000`.
 
 Review service tersedia di `http://localhost:3002`. Jika PowerShell memblokir
 aktivasi environment, jalankan `venv\Scripts\python.exe run.py` dan gunakan
@@ -28,7 +38,8 @@ aktivasi environment, jalankan `venv\Scripts\python.exe run.py` dan gunakan
 
 ## Menjalankan seluruh service dengan Docker
 
-Dari folder `microservices`, jalankan:
+Alternatifnya, Compose gabungan dari folder `microservices` menjalankan semua
+service proyek:
 
 ```powershell
 docker compose up --build

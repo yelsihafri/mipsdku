@@ -7,7 +7,7 @@ from app.database import init_db
 from app.routes.review_routes import review_bp
 
 
-def create_app():
+def create_app(): 
     load_dotenv()
     app = Flask(__name__)
     app.logger.setLevel(logging.INFO)

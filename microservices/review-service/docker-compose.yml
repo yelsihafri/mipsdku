@@ -58,7 +58,7 @@ services:
       - product-db-data:/var/lib/mysql
       - ../product-service/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--******"]
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=rootpassword"]
       interval: 10s
       retries: 5
       start_period: 30s

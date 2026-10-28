@@ -73,10 +73,13 @@ services:
     networks:
       - microservices-network
 
+  
   order-service:
     build: ./order-service
     ports:
       - "3003:3003"
+    env_file:
+      - ./order-service/.env
     environment:
       APP_NAME: "Order Service"
       APP_ENV: local

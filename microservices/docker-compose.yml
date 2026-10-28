@@ -80,6 +80,8 @@ services:
       - "3003:3003"
     env_file:
       - ./order-service/.env
+    volumes:
+      - ./order-service:/var/www/html
     environment:
       APP_NAME: "Order Service"
       APP_ENV: local

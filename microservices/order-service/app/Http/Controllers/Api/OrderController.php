@@ -15,6 +15,22 @@ class OrderController extends Controller
             'data' => Order::latest()->get(),
         ], 200);
     }
+    
+    public function show(string $id)
+{
+    $order = Order::find($id);
+
+    if (!$order) {
+        return response()->json([
+            'message' => 'Pesanan tidak ditemukan',
+        ], 404);
+    }
+
+    return response()->json([
+        'message' => 'Detail pesanan berhasil diambil',
+        'data' => $order,
+    ], 200);
+}
 
     public function store(Request $request)
     {

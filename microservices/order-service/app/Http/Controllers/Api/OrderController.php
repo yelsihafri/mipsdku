@@ -8,13 +8,23 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index()
-    {
-        return response()->json([
-            'message' => 'Daftar pesanan berhasil diambil',
-            'data' => Order::latest()->get(),
-        ], 200);
+    public function index(Request $request)
+{
+    $validated = $request->validate([
+        'status' => 'sometimes|in:pending,processing,completed,cancelled',
+    ]);
+
+    $query = Order::latest();
+
+    if (isset($validated['status'])) {
+        $query->where('status', $validated['status']);
     }
+
+    return response()->json([
+        'message' => 'Daftar pesanan berhasil diambil',
+        'data' => $query->get(),
+    ], 200);
+}
 
     public function show(string $id)
     {

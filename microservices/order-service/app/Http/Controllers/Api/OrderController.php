@@ -12,6 +12,8 @@ class OrderController extends Controller
 {
     $validated = $request->validate([
         'status' => 'sometimes|in:pending,processing,completed,cancelled',
+        'per_page' => 'sometimes|integer|min:1|max:100',
+        'page' => 'sometimes|integer|min:1',
     ]);
 
     $query = Order::latest();
@@ -20,9 +22,19 @@ class OrderController extends Controller
         $query->where('status', $validated['status']);
     }
 
+    $perPage = $validated['per_page'] ?? 10;
+
+    $orders = $query->paginate($perPage);
+
     return response()->json([
         'message' => 'Daftar pesanan berhasil diambil',
-        'data' => $query->get(),
+        'data' => $orders->items(),
+        'pagination' => [
+            'current_page' => $orders->currentPage(),
+            'per_page' => $orders->perPage(),
+            'total' => $orders->total(),
+            'last_page' => $orders->lastPage(),
+        ],
     ], 200);
 }
 

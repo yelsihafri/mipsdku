@@ -14,12 +14,21 @@ class OrderController extends Controller
         'status' => 'sometimes|in:pending,processing,completed,cancelled',
         'per_page' => 'sometimes|integer|min:1|max:100',
         'page' => 'sometimes|integer|min:1',
+        'search' => 'sometimes|string|max:100',
     ]);
 
     $query = Order::latest();
 
     if (isset($validated['status'])) {
         $query->where('status', $validated['status']);
+    }
+
+    if (isset($validated['search'])) {
+        $query->where(
+            'customer_name',
+            'like',
+            '%' . $validated['search'] . '%'
+        );
     }
 
     $perPage = $validated['per_page'] ?? 10;

@@ -17,20 +17,20 @@ class OrderController extends Controller
     }
 
     public function show(string $id)
-{
-    $order = Order::find($id);
+    {
+        $order = Order::find($id);
 
-    if (!$order) {
+        if (!$order) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan',
+            ], 404);
+        }
+
         return response()->json([
-            'message' => 'Pesanan tidak ditemukan',
-        ], 404);
+            'message' => 'Detail pesanan berhasil diambil',
+            'data' => $order,
+        ], 200);
     }
-
-    return response()->json([
-        'message' => 'Detail pesanan berhasil diambil',
-        'data' => $order,
-    ], 200);
-}
 
     public function store(Request $request)
     {
@@ -51,28 +51,45 @@ class OrderController extends Controller
     }
 
     public function update(Request $request, string $id)
-{
-    $order = Order::find($id);
+    {
+        $order = Order::find($id);
 
-    if (!$order) {
+        if (!$order) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'customer_name' => 'sometimes|required|string|max:255',
+            'product_name' => 'sometimes|required|string|max:255',
+            'quantity' => 'sometimes|required|integer|min:1',
+            'total_price' => 'sometimes|required|numeric|min:0',
+            'status' => 'sometimes|required|in:pending,processing,completed,cancelled',
+        ]);
+
+        $order->update($validated);
+
         return response()->json([
-            'message' => 'Pesanan tidak ditemukan',
-        ], 404);
+            'message' => 'Pesanan berhasil diperbarui',
+            'data' => $order->fresh(),
+        ], 200);
     }
 
-    $validated = $request->validate([
-        'customer_name' => 'sometimes|required|string|max:255',
-        'product_name' => 'sometimes|required|string|max:255',
-        'quantity' => 'sometimes|required|integer|min:1',
-        'total_price' => 'sometimes|required|numeric|min:0',
-        'status' => 'sometimes|required|in:pending,processing,completed,cancelled',
-    ]);
+    public function destroy(string $id)
+    {
+        $order = Order::find($id);
 
-    $order->update($validated);
+        if (!$order) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan',
+            ], 404);
+        }
 
-    return response()->json([
-        'message' => 'Pesanan berhasil diperbarui',
-        'data' => $order->fresh(),
-    ], 200);
-}
+        $order->delete();
+
+        return response()->json([
+            'message' => 'Pesanan berhasil dihapus',
+        ], 200);
+    }
 }

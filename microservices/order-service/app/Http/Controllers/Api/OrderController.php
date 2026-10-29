@@ -46,6 +46,19 @@ class OrderController extends Controller
         ],
     ], 200);
 }
+    public function statistics()
+{
+    return response()->json([
+        'message' => 'Statistik pesanan berhasil diambil',
+        'data' => [
+            'total_orders' => Order::count(),
+            'pending' => Order::where('status', 'pending')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'completed' => Order::where('status', 'completed')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+        ],
+    ], 200);
+}
 
     public function show(string $id)
     {

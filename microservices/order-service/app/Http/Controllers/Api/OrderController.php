@@ -11,11 +11,11 @@ class OrderController extends Controller
     public function index(Request $request)
 {
     $validated = $request->validate([
-        'status' => 'sometimes|in:pending,processing,completed,cancelled',
-        'per_page' => 'sometimes|integer|min:1|max:100',
-        'page' => 'sometimes|integer|min:1',
-        'search' => 'sometimes|string|max:100',
-    ]);
+    'status' => 'sometimes|in:pending,processing,completed,cancelled',
+    'per_page' => 'sometimes|integer|min:1|max:100',
+    'page' => 'sometimes|integer|min:1',
+    'search' => 'sometimes|string|max:100',
+]);
 
     $query = Order::latest();
 
@@ -77,22 +77,27 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'product_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'total_price' => 'required|numeric|min:0',
-            'status' => 'sometimes|in:pending,processing,completed,cancelled',
-        ]);
+{
+    $request->merge([
+        'customer_name' => trim((string) $request->input('customer_name')),
+        'product_name' => trim((string) $request->input('product_name')),
+    ]);
 
-        $order = Order::create($validated);
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+        'product_name' => 'required|string|max:255',
+        'quantity' => 'required|integer|min:1|max:100000',
+        'total_price' => 'required|numeric|min:0',
+        'status' => 'sometimes|in:pending,processing,completed,cancelled',
+    ]);
 
-        return response()->json([
-            'message' => 'Pesanan berhasil dibuat',
-            'data' => $order,
-        ], 201);
-    }
+    $order = Order::create($validated);
+
+    return response()->json([
+        'message' => 'Pesanan berhasil dibuat',
+        'data' => $order,
+    ], 201);
+}
 
     public function update(Request $request, string $id)
     {
@@ -103,6 +108,14 @@ class OrderController extends Controller
                 'message' => 'Pesanan tidak ditemukan',
             ], 404);
         }
+        $request->merge([
+    'customer_name' => $request->has('customer_name')
+        ? trim((string) $request->input('customer_name'))
+        : null,
+    'product_name' => $request->has('product_name')
+        ? trim((string) $request->input('product_name'))
+        : null,
+]);
 
         $validated = $request->validate([
             'customer_name' => 'sometimes|required|string|max:255',

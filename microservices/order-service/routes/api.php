@@ -14,10 +14,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::post('/checkout', [OrderController::class, 'checkout']);
+
     // Order API
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
     Route::get('/orders/statistics', [OrderController::class, 'statistics']);
+     Route::post('/orders/{id}/pay', [OrderController::class, 'pay']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);
     Route::delete('/orders/{id}', [OrderController::class, 'destroy']);

@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\CheckoutService;
+use RuntimeException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -132,7 +135,72 @@ class OrderController extends Controller
             'data' => $order->fresh(),
         ], 200);
     }
+    public function checkout(Request $request, CheckoutService $checkoutService)
+{
+    $validated = $request->validate([
+        'customer_name' => 'required|string|max:255',
+    ]);
 
+    try {
+        $orders = $checkoutService->checkout(
+            (int) $request->user()->id,
+            trim($validated['customer_name'])
+        );
+
+        return response()->json([
+            'message' => 'Checkout berhasil.',
+            'data' => $orders,
+        ], 201);
+
+    } catch (RuntimeException $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 422);
+    }
+}
+public function pay(string $id)
+{
+    try {
+        $order = DB::transaction(function () use ($id) {
+            $order = Order::where('id', $id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$order) {
+                return null;
+            }
+
+            if ($order->status !== 'pending') {
+                throw new RuntimeException(
+                    'Pesanan tidak dapat dibayar karena statusnya bukan pending.'
+                );
+            }
+
+            // Simulasi pembayaran berhasil.
+            $order->update([
+                'status' => 'processing',
+            ]);
+
+            return $order->fresh();
+        });
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Simulasi pembayaran berhasil.',
+            'data' => $order,
+        ], 200);
+
+    } catch (RuntimeException $e) {
+        return response()->json([
+            'message' => $e->getMessage(),
+        ], 422);
+    }
+}
     public function destroy(string $id)
     {
         $order = Order::find($id);

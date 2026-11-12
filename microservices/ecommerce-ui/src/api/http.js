@@ -1,3 +1,4 @@
+
 const TIMEOUT_MS = 5000;
 
 export class ApiError extends Error {
@@ -10,6 +11,12 @@ export class ApiError extends Error {
 }
 
 export async function request(baseUrl, path, options = {}) {
+  const {
+    method = 'GET',
+    body,
+    headers = {},
+  } = options;
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -17,27 +24,38 @@ export async function request(baseUrl, path, options = {}) {
     const response = await fetch(`${baseUrl}${path}`, {
       method,
       headers: {
-        accept: 'application/json',
-        ...(body ? { 'Content-type': 'application/json' } : {}),
+        Accept: 'application/json',
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...headers,
       },
       body: body ? JSON.stringify(body) : undefined,
       signal: controller.signal,
     });
-    
+
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new ApiError(payload?.massage ?? 'Permintaan gagal (${response.status})', {
-        status: response.status,
-        errors: payload?.errors ?? null,
-      });
+      throw new ApiError(
+        payload?.message ?? `Permintaan gagal (${response.status})`,
+        {
+          status: response.status,
+          errors: payload?.errors ?? null,
+        }
+      );
     }
-  } catch (error) {
-    if (error instanceof ApiError) throw error;
-    if (error.name === 'AbortError') throw new ApiError('Server terlalu lama menjawab')
-      throw new ApiError('Tidak dapat terhubung ke server')
-}finally {
-    clearTimeout(timer);
-}
 
+    return payload;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (error.name === 'AbortError') {
+      throw new ApiError('Server terlalu lama menjawab');
+    }
+
+    throw new ApiError('Tidak dapat terhubung ke server');
+  } finally {
+    clearTimeout(timer);
+  }
 }

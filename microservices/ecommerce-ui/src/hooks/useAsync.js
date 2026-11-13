@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 
 export function useAsync(asyncFn, deps = []) {
     const [reloadCount, setReloadCount] = useState(0)
     const [result, setResult] = useState({ key: null })
     const key = `${JSON.stringify(deps)}:${reloadCount}`
+    const runAsync = useEffectEvent(asyncFn)
 
     useEffect(() => {
         let cancelled = false
-        asyncFn()
+        runAsync()
             .then((data) => {
                 if (!cancelled) setResult({ key, data, error: null })
             })

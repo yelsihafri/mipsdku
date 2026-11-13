@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { getProductDetail } from '../api/aggregate'
 import { addToCart } from '../api/cartApi'
 import AsyncView from '../components/AsyncView'
+import ProductImage from '../components/ProductImage'
 import ReviewForm from '../components/ReviewForm'
 import StarRating from '../components/StarRating'
 import { useAsync } from '../hooks/useAsync'
@@ -28,42 +29,47 @@ export default function ProductDetailPage({ userId }) {
             }
         }
 return (
-            <section>
-                <Link to="/">&larr; Kembali ke daftar produk</Link>
+            <section className="detail-page">
+                <Link className="back-link" to="/">← Kembali ke koleksi</Link>
                 <AsyncView loading={loading} error={error} onRetry={reload}>
                     {data && (
                         <>
-                            <h1>{data.product.name}</h1>
-                            <p>{data.product.description}</p>
-                            <p className="price">{formatRupiah(data.product.price)}
-
-                            </p>
-
-                            <p className="muted">Stok: {data.product.stock}</p>
-                            {data.reviews && (
-                                <StarRating
-                                    average={data.reviews.summary.average_rating}
-                                    total={data.reviews.summary.total_reviews}
-                                />
-                            )}
-                            <div className="actions">
-                                <input
-                                    type="number"
-                                    min="1"
-                                    value={quantity}
-                                    aria-label="Jumlah"
-                                    onChange={(e) => setQuantity(e.target.value)}
-                                />
-                                <button type="button" onClick={handleAddToCart}>
-                                    Masukkan ke keranjang
-                                </button>
+                            <div className="detail-card">
+                                <ProductImage product={data.product} className="detail-image" />
+                                <div className="detail-info">
+                                    <span className="eyebrow">KOLEKSI TOKOKITA</span>
+                                    <h1>{data.product.name}</h1>
+                                    {data.reviews && (
+                                        <StarRating
+                                            average={data.reviews.summary.average_rating}
+                                            total={data.reviews.summary.total_reviews}
+                                        />
+                                    )}
+                                    <p className="detail-description">{data.product.description}</p>
+                                    <p className="price detail-price">{formatRupiah(data.product.price)}</p>
+                                    <p className="stock-label">{data.product.stock > 0 ? `${data.product.stock} tersedia` : 'Stok habis'}</p>
+                                    <div className="actions">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={quantity}
+                                            aria-label="Jumlah"
+                                            onChange={(e) => setQuantity(e.target.value)}
+                                        />
+                                        <button className="button button-dark" type="button" onClick={handleAddToCart}>
+                                            Masukkan ke keranjang <span>↗</span>
+                                        </button>
+                                    </div>
+                                    {cartMessage && (
+                                        <p className={`alert alert-${cartMessage.type}`}>{cartMessage.text}</p>
+                                    )}
+                                    <p className="detail-promise">✦ Pilihan berkualitas, siap menemani harimu.</p>
+                                </div>
                             </div>
-                            {cartMessage && (
-                                <p className={`alert alert-${cartMessage.type}`}>
-
-                                    {cartMessage.text}</p>
-                            )}
-                            <h2>Review</h2>
+                            <div className="review-section">
+                                <div className="section-heading">
+                                    <div><span className="eyebrow">CERITA PELANGGAN</span><h2>Review<span>.</span></h2></div>
+                                </div>
                             {data.reviews ? (
                                 <ul className="reviews">
                                     {data.reviews.reviews.map((review) => (
@@ -97,6 +103,7 @@ return (
                             <ReviewForm productId={Number(id)} userId={userId}
 
                                 onCreated={reload} />
+                            </div>
                         </>
                     )}
                 </AsyncView>

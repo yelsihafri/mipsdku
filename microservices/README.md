@@ -46,29 +46,28 @@ Gambaran komunikasi:
 
 ```text
 
-&#x20;                Client
+                Client
 
-&#x20;                  |
+                  |
 
-&#x20;                  v
+                  v
 
-&#x20;            Order Service
+            Order Service
 
-&#x20;              (Laravel)
+              (Laravel)
 
-&#x20;             /        \\
+             /        \\
 
-&#x20;            v          v
+            v          v
 
-&#x20;     Product Service  Cart Service
-
-&#x20;       (Node.js)       (Laravel)
-
+     Product Service  Cart Service
+       (Node.js)       (Laravel)
 
 
-&#x20;     Review Service
 
-&#x20;        (Flask)
+     Review Service
+
+        (Flask)
 
 ```
 

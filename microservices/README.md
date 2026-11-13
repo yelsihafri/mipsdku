@@ -370,7 +370,7 @@ Link video demonstrasi:
 
 
 
-\*\*\[Masukkan link video demonstrasi di sini]\*\*
+\*\*\[https://drive.google.com/drive/folders/1y-YkPMeZICW1Avf0Oz3CqVsiU9MWE4ur]\*\*
 
 
 
@@ -386,7 +386,7 @@ Source code proyek tersedia pada repository GitHub:
 
 
 
-\*\*\[Masukkan link repository GitHub di sini]\*\*
+\*\*\[(https://github.com/yelsihafri/mipsdku/tree/main/microservices)]\*\*
 
 
 
